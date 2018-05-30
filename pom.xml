@@ -29,7 +29,7 @@
 
 	<groupId>com.ixortalk</groupId>
 	<artifactId>ixortalk-assetstate</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>ixortalk-assetstate</name>
@@ -88,7 +88,7 @@
 		<connection>scm:git:git@github.com:ixortalkadmin/ixortalk-assetstate.git</connection>
 		<developerConnection>scm:git:git@github.com:ixortalkadmin/ixortalk-assetstate.git</developerConnection>
 		<url>https://github.com/ixortalkadmin/ixortalk-assetstate/tree/master</url>
-		<tag>HEAD</tag>
+		<tag>ixortalk-assetstate-1.0.0</tag>
 	</scm>
 
 	<distributionManagement>
