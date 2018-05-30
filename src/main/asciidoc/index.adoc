@@ -1,0 +1,25 @@
+= Asset State
+:doctype: book
+:icons: font
+:toc: left
+:toclevels: 4
+:sectlinks:
+:source-highlighter: highlightjs
+
+== OAuth
+
+This API is secured using Oauth. To access the API you need to retrieve an access token from the auth server
+and use it to call this API.
+
+== Retrieving all assets' states
+
+Via curl:
+include::{snippets}/assetstates/get/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/assetstates/get/ok/http-request.adoc[]
+
+=== Response OK
+
+include::{snippets}/assetstates/get/ok/http-response.adoc[]
+

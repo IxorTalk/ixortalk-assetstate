@@ -1,0 +1,77 @@
+{
+  "asset1": {
+    "aspects": [
+      {
+        "name": "test-aspect1",
+        "value": "0",
+        "status": "ERROR",
+        "localDateTime": "2016-07-22T07:49:08"
+      },
+      {
+        "name": "test-aspect2",
+        "value": "aaa",
+        "status": "ERROR",
+        "localDateTime": "2016-07-22T07:49:08"
+      }
+    ],
+    "id": "asset1",
+    "status": "ERROR"
+  },
+  "asset2": {
+    "aspects": [
+      {
+        "name": "test-aspect1",
+        "value": "1",
+        "status": "OK",
+        "localDateTime": "2016-07-22T07:49:08"
+      },
+      {
+        "name": "test-aspect2",
+        "value": "bbb",
+        "status": "ERROR",
+        "localDateTime": "2016-07-22T07:49:08"
+      }
+    ],
+    "id": "asset2",
+    "status": "ERROR"
+  },
+  "asset3": {
+    "aspects": [
+      {
+        "name": "test-aspect1",
+        "value": "",
+        "status": "UNKNOWN",
+        "localDateTime": null
+
+      },
+      {
+        "name": "test-aspect2",
+        "value": "1",
+        "status": "ERROR",
+        "localDateTime": "2016-07-22T07:49:08"
+      }
+    ],
+    "id": "asset3",
+    "status": "ERROR"
+  },
+  "asset_only_known_in_assetmgmt": {
+    "aspects": [
+      {
+        "name": "test-aspect1",
+        "value": "",
+        "status": "UNKNOWN",
+        "localDateTime": null
+
+      },
+      {
+        "name": "test-aspect2",
+        "value": "",
+        "status": "UNKNOWN",
+        "localDateTime": null
+      }
+    ],
+    "id": "asset_only_known_in_assetmgmt",
+    "status": "UNKNOWN"
+  }
+
+}

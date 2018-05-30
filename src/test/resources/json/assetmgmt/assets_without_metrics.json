@@ -1,0 +1,30 @@
+{
+  "_embedded": {
+    "assets": [
+      {
+        "assetId": "f2aa0731-a985-413f-a7e3-a8fd03cd5001",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset1_not_in_prometheus"
+          }
+        }
+      },
+      {
+        "assetId": "74721c8d-a491-4735-abdc-b109006fd002",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset2_not_in_prometheus"
+          }
+        }
+      },
+      {
+        "assetId": "74721c8d-a491-4735-abdc-b109006fd003",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset3_not_in_prometheus"
+          }
+        }
+      }
+    ]
+  }
+}

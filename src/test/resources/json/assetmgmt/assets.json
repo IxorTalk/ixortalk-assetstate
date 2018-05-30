@@ -1,0 +1,45 @@
+{
+  "_embedded": {
+    "assets": [
+      {
+        "assetId": "f2aa0731-a985-413f-a7e3-a8fd03cd5001",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset1",
+            "labelKey1": "labelValue1",
+            "labelKey2": "labelValue2",
+            "someOtherLabel": "someOtherLabelValue"
+          }
+        }
+      },
+      {
+        "assetId": "74721c8d-a491-4735-abdc-b109006fd002",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset2",
+            "labelKey1": "labelValue1",
+            "labelKey2": "notLabelValue2"
+          }
+        }
+      },
+      {
+        "assetId": "74721c8d-a491-4735-abdc-b109006fd003",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset3"
+          }
+        }
+      },
+      {
+        "assetId": "74721c8d-a491-4735-abdc-b109006fd004",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset_only_known_in_assetmgmt",
+            "labelKey1": "labelValue1",
+            "labelKey2": "labelValue2"
+          }
+        }
+      }
+    ]
+  }
+}

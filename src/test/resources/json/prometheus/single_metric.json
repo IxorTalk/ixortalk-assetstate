@@ -1,0 +1,26 @@
+{
+  "data": {
+    "result": [
+  {
+    "metric": {
+      "__name__": "metricName",
+      "controllerId": "asset1",
+      "group": "group1",
+      "instance": "localhost:9393",
+      "job": "Controllers"
+    },
+    "values": [
+      [
+        1471438595.000,
+        "0"
+      ],
+      [
+        1471502077.724,
+        "1"
+      ]
+    ]
+  }],
+  "resultType": "vector"
+},
+"status": "success"
+}

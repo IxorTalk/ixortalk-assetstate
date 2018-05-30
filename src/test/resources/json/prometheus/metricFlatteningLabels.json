@@ -1,0 +1,71 @@
+{
+  "data": {
+    "result": [
+  {
+    "metric": {
+      "__name__": "metricName",
+      "controllerId": "asset1",
+      "group": "group1",
+      "instance": "localhost:9393",
+      "job": "Controllers",
+      "labelA": "labelA1",
+      "labelB": "labelB1"
+    },
+    "values": [
+      [
+        1471502077.724,
+        "1"
+      ],
+      [
+        1469173748.339,
+        "0"
+      ]
+    ]
+  },
+  {
+    "metric": {
+      "__name__": "metricName",
+      "controllerId": "asset1",
+      "group": "group1",
+      "instance": "localhost:9292",
+      "job": "Controllers",
+      "labelA": "labelA1",
+      "labelB": "labelB2"
+    },
+    "values": [
+      [
+        1471502077.724,
+        "0"
+      ],
+      [
+        1469173748.339,
+        "1"
+      ]
+    ]
+  },
+  {
+    "metric": {
+      "__name__": "metricName",
+      "controllerId": "asset1",
+      "group": "group1",
+      "instance": "192.168.1.58:9191",
+      "job": "Controllers",
+      "labelA": "labelA2",
+      "labelB": "labelB2"
+    },
+    "values": [
+      [
+        1471502077.724,
+        "1"
+      ],
+      [
+        1469173748.339,
+        "2"
+      ]
+    ]
+  }
+],
+  "resultType": "vector"
+},
+"status": "success"
+}

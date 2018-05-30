@@ -1,0 +1,26 @@
+{
+  "data": {
+    "result": [
+  {
+    "metric": {
+      "__name__": "metric1",
+      "info": "No prometheus identifier present (controllerId in these tests)",
+      "group": "group1",
+      "instance": "localhost:9393",
+      "job": "Controllers"
+    },
+    "values": [
+      [
+        1451609970.000,
+        "1"
+      ],
+      [
+        1451609985.000,
+        "0"
+      ]
+    ]
+  }],
+  "resultType": "vector"
+},
+"status": "success"
+}

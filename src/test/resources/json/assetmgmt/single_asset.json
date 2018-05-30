@@ -1,0 +1,14 @@
+{
+  "_embedded": {
+    "assets": [
+      {
+        "assetId": "f2aa0731-a985-413f-a7e3-a8fd03cd5001",
+        "assetProperties": {
+          "properties": {
+            "controllerId": "asset1"
+          }
+        }
+      }
+    ]
+  }
+}

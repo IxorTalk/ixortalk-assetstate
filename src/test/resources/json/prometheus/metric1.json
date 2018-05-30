@@ -1,0 +1,65 @@
+{
+  "data": {
+    "result": [
+  {
+    "metric": {
+      "__name__": "metric1",
+      "controllerId": "asset1",
+      "group": "group1",
+      "instance": "localhost:9393",
+      "job": "Controllers"
+    },
+    "values": [
+      [
+        1471502077.724,
+        "1"
+      ],
+      [
+        1469173748.339,
+        "0"
+      ]
+    ]
+  },
+  {
+    "metric": {
+      "__name__": "metric1",
+      "controllerId": "asset2",
+      "group": "group1",
+      "instance": "localhost:9292",
+      "job": "Controllers"
+    },
+    "values": [
+      [
+        1471502077.724,
+        "0"
+      ],
+      [
+        1469173748.339,
+        "1"
+      ]
+    ]
+  },
+  {
+    "metric": {
+      "__name__": "metric1",
+      "controllerId": "asset_only_known_in_prometheus",
+      "group": "group1",
+      "instance": "192.168.1.58:9191",
+      "job": "Controllers"
+    },
+    "values": [
+      [
+        1471502077.724,
+        "1"
+      ],
+      [
+        1469173748.339,
+        "2"
+      ]
+    ]
+  }
+],
+  "resultType": "vector"
+},
+"status": "success"
+}
