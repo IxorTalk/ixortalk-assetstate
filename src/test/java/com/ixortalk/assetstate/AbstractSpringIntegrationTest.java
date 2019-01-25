@@ -23,8 +23,6 @@
  */
 package com.ixortalk.assetstate;
 
-import javax.inject.Inject;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.ixortalk.assetstate.config.FixedClockConfiguration;
@@ -49,10 +47,9 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import javax.inject.Inject;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_ID_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_SECRET_ADMIN;
 import static com.ixortalk.test.util.FileUtil.jsonFile;
@@ -94,7 +91,6 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
 
 
     protected static final String ASSETS = jsonFile("assetmgmt/assets.json");
-    protected static final String ASSETS_NOT_KNOWN_IN_PROMETHEUS = jsonFile("assetmgmt/assets_without_metrics.json");
     protected static final String SINGLE_ASSET = jsonFile("assetmgmt/single_asset.json");
     protected static final String EXPECTED_PROMETHEUS_SINGLE_METRIC_RESPONSE = jsonFile("prometheus/single_metric.json");
     protected static final String EXPECTED_PROMETHEUS_SINGLE_FRESH_METRICS_RESPONSE = jsonFile("prometheus/single_fresh_metric.json");

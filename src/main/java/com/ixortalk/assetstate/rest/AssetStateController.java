@@ -23,13 +23,6 @@
  */
 package com.ixortalk.assetstate.rest;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
 import com.ixortalk.assetstate.config.AssetStateAspectProperties;
 import com.ixortalk.assetstate.domain.aspect.AssetState;
 import com.ixortalk.assetstate.domain.asset.Asset;
@@ -41,20 +34,22 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static com.ixortalk.assetstate.domain.aspect.Aspect.newAspect;
 import static com.ixortalk.assetstate.domain.aspect.Aspect.newEmptyAspect;
 import static com.ixortalk.assetstate.domain.aspect.AssetState.newAssetState;
 import static com.ixortalk.assetstate.domain.prometheus.PrometheusQuery.PrometheusQueryParam.newPrometheusQueryParam;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 import static java.util.stream.StreamSupport.stream;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 
-@RestController()
+@RestController
 @RequestMapping("/states")
 @EnableConfigurationProperties(AssetStateAspectProperties.class)
 public class AssetStateController {
@@ -69,11 +64,11 @@ public class AssetStateController {
     private AssetStateAspectProperties assetStateAspectProperties;
 
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
-    public Map<String, AssetState> getAssetStates() throws Exception {
+    public Map<String, AssetState> getAssetStates() {
 
         List<Asset> assets = stream(assetMgmt.assets().spliterator(), false).collect(toList());
 
-        Map<String, AssetState> monitoredAssets = assetStateAspectProperties.getAspects().entrySet()
+        return assetStateAspectProperties.getAspects().entrySet()
                 .stream()
                 .flatMap(aspect ->
                         prometheusQuery.getRangeVectorFromInstantQuery(
@@ -89,25 +84,10 @@ public class AssetStateController {
                 .entrySet()
                 .stream()
                 .map(this::convertMetricResultToAssetState)
-                .collect(toMap(AssetState::getId, identity()));
-
-        Map<String, AssetState> nonMonitoredAssets = assets
-                .stream()
-                .filter(asset -> !monitoredAssets.containsKey(asset.getAssetProperties().getProperties().get(assetStateAspectProperties.getMapping().getIdentifier())))
-                .collect(groupingBy(asset -> asset.getAssetProperties().getProperties().get(assetStateAspectProperties.getMapping().getIdentifier()).toString()))
-                .entrySet()
-                .stream()
-                .map(AssetStateController::convertEmptyAssetToAssetState)
-                .collect(toMap(AssetState::getId, identity()));
-
-        Map<String, AssetState> combinedAssets = new HashMap<>();
-        combinedAssets.putAll(monitoredAssets);
-        combinedAssets.putAll(nonMonitoredAssets);
-
-        combinedAssets.values().forEach(assetState -> postProcessEntries(assetState, assetStateAspectProperties.getAspects(), assets));
-
-        return combinedAssets;
-
+                .collect(
+                        toMap(
+                                AssetState::getId,
+                                assetState -> postProcessEntries(assetState, assetStateAspectProperties.getAspects(), assets)));
     }
 
     private boolean existingAsset(List<Asset> assets, PrometheusRangeQueryResult.Data.RangeQueryMetric prometheusMetric) {
@@ -120,10 +100,6 @@ public class AssetStateController {
                 .filter(configuredAspectKey -> !assetState.getAspects().stream().anyMatch(aspect -> aspect.getName().equals(configuredAspectKey)))
                 .forEach(configuredAspectKey -> assetState.addAspect(newEmptyAspect(configuredAspectKey)));
         return assetState;
-    }
-
-    private static AssetState convertEmptyAssetToAssetState(Map.Entry<String, List<Asset>> stringListEntry) {
-        return newAssetState().withId(stringListEntry.getKey()).build();
     }
 
     private AssetState convertMetricResultToAssetState(Map.Entry<String, List<Pair<String, PrometheusRangeQueryResult.Data.RangeQueryMetric>>> entry) {

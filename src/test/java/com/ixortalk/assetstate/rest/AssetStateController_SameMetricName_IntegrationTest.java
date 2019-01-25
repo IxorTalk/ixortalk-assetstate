@@ -23,16 +23,15 @@
  */
 package com.ixortalk.assetstate.rest;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.ixortalk.assetstate.AbstractSpringIntegrationTest;
 import com.ixortalk.assetstate.domain.aspect.AssetState;
 import com.ixortalk.assetstate.domain.asset.AspectBuilderforTest;
 import org.junit.Test;
 import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguration;
 import org.springframework.test.context.ActiveProfiles;
+
+import javax.inject.Inject;
+import java.util.Map;
 
 import static com.ixortalk.assetstate.domain.aspect.Status.OK;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetric;
@@ -53,7 +52,7 @@ public class AssetStateController_SameMetricName_IntegrationTest extends Abstrac
 
         Map<String, AssetState> assetStates = assetStateController.getAssetStates();
 
-        assertThat(assetStates).hasSize(4);
+        assertThat(assetStates).hasSize(1);
         assertThat(assetStates.get("asset1").getAspects())
                 .usingElementComparatorIgnoringFields("localDateTime")
                 .containsOnly(
