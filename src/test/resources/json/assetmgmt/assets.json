@@ -29,16 +29,6 @@
             "controllerId": "asset3"
           }
         }
-      },
-      {
-        "assetId": "74721c8d-a491-4735-abdc-b109006fd004",
-        "assetProperties": {
-          "properties": {
-            "controllerId": "asset_only_known_in_assetmgmt",
-            "labelKey1": "labelValue1",
-            "labelKey2": "labelValue2"
-          }
-        }
       }
     ]
   }

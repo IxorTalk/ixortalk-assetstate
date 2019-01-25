@@ -23,15 +23,14 @@
  */
 package com.ixortalk.assetstate.rest;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import com.ixortalk.assetstate.AbstractSpringIntegrationTest;
 import com.ixortalk.assetstate.domain.aspect.AssetState;
 import org.junit.Test;
 import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguration;
 import org.springframework.test.context.ActiveProfiles;
+
+import javax.inject.Inject;
+import java.util.Map;
 
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetricWithIncludeLabels;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,10 +50,6 @@ public class AssetStateController_IncludeLabels_IntegrationTest extends Abstract
 
         Map<String, AssetState> assetStates = assetStateController.getAssetStates();
 
-        assertThat(assetStates).hasSize(4);
-        assertThat(assetStates.get("asset1").getAspects().stream().anyMatch(aspect -> aspect.getName().equals("include-labels"))).isTrue();
-        assertThat(assetStates.get("asset2").getAspects().stream().anyMatch(aspect -> aspect.getName().equals("include-labels"))).isFalse();
-        assertThat(assetStates.get("asset3").getAspects().stream().anyMatch(aspect -> aspect.getName().equals("include-labels"))).isFalse();
-        assertThat(assetStates.get("asset_only_known_in_assetmgmt").getAspects().stream().anyMatch(aspect -> aspect.getName().equals("include-labels"))).isTrue();
+        assertThat(assetStates).hasSize(1).containsKeys("asset1");
     }
 }

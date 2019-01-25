@@ -53,25 +53,5 @@
     ],
     "id": "asset3",
     "status": "ERROR"
-  },
-  "asset_only_known_in_assetmgmt": {
-    "aspects": [
-      {
-        "name": "test-aspect1",
-        "value": "",
-        "status": "UNKNOWN",
-        "localDateTime": null
-
-      },
-      {
-        "name": "test-aspect2",
-        "value": "",
-        "status": "UNKNOWN",
-        "localDateTime": null
-      }
-    ],
-    "id": "asset_only_known_in_assetmgmt",
-    "status": "UNKNOWN"
   }
-
 }
