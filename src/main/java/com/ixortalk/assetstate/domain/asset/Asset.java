@@ -24,7 +24,6 @@
 package com.ixortalk.assetstate.domain.asset;
 
 import java.util.Map;
-import java.util.Set;
 
 public class Asset {
 

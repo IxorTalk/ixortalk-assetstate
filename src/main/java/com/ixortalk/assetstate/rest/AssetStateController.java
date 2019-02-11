@@ -65,6 +65,7 @@ public class AssetStateController {
 
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
     public Map<String, AssetState> getAssetStates() {
+
         List<Asset> assets = stream(assetMgmt.assets().spliterator(), false).collect(toList());
 
         return assetStateAspectProperties.getAspects().entrySet()
