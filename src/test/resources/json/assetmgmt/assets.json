@@ -31,7 +31,7 @@
             "controllerId": "asset3"
           }
         },
-        "roles": ["ROLE_TEST"]
+        "roles": ["ROLE_ORGANIZATION_X_ADMIN"]
       }
     ]
   }

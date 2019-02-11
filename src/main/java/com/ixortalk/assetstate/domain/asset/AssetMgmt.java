@@ -23,14 +23,14 @@
  */
 package com.ixortalk.assetstate.domain.asset;
 
-import com.ixortalk.assetstate.config.feign.OAuth2ServiceFeignConfiguration;
+import com.ixortalk.assetstate.config.feign.OAuth2ServicePropagatingFeignConfiguration;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-@FeignClient(name = "assetmgmt",url = "${assetstate.assetmgmt.url}", configuration = OAuth2ServiceFeignConfiguration.class)
+@FeignClient(name = "assetmgmt",url = "${assetstate.assetmgmt.url}", configuration = OAuth2ServicePropagatingFeignConfiguration.class)
 public interface AssetMgmt {
 
     @RequestMapping(method = GET,path = "/assets")

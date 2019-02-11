@@ -21,13 +21,9 @@ include::{snippets}/assetstates/get/ok/http-request.adoc[]
 
 === Response
 
-As organization admin:
+As admin (filtered on assets where the admin has access to):
 
 include::{snippets}/assetstates/get/ok/http-response.adoc[]
-
-As organization admin from a different organization:
-
-include::{snippets}/assetstates/get/different-admin/http-response.adoc[]
 
 As a user:
 

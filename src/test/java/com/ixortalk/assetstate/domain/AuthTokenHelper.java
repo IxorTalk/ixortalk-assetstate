@@ -21,18 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.assetstate.domain.auth;
+package com.ixortalk.assetstate.domain;
 
-import java.util.Set;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
-public class AuthServerUser {
+import static java.lang.String.format;
+import static org.springframework.security.oauth2.common.OAuth2AccessToken.BEARER_TYPE;
 
-    private Set<String> authorities;
+public class AuthTokenHelper {
 
-    public AuthServerUser() {
+    public static String authorizationHeader(OAuth2AccessToken oAuth2AccessToken) {
+        return authorizationHeader(oAuth2AccessToken.getValue());
     }
 
-    public Set<String> getAuthorities() {
-        return authorities;
+    public static String authorizationHeader(String accessToken) {
+        return format("%s %s", BEARER_TYPE, accessToken);
     }
 }

@@ -27,7 +27,6 @@ import com.ixortalk.assetstate.config.AssetStateAspectProperties;
 import com.ixortalk.assetstate.domain.aspect.AssetState;
 import com.ixortalk.assetstate.domain.asset.Asset;
 import com.ixortalk.assetstate.domain.asset.AssetMgmt;
-import com.ixortalk.assetstate.domain.auth.AuthServer;
 import com.ixortalk.assetstate.domain.prometheus.PrometheusQuery;
 import com.ixortalk.assetstate.domain.prometheus.PrometheusRangeQueryResult;
 import org.apache.commons.lang3.tuple.Pair;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +43,6 @@ import static com.ixortalk.assetstate.domain.aspect.Aspect.newAspect;
 import static com.ixortalk.assetstate.domain.aspect.Aspect.newEmptyAspect;
 import static com.ixortalk.assetstate.domain.aspect.AssetState.newAssetState;
 import static com.ixortalk.assetstate.domain.prometheus.PrometheusQuery.PrometheusQueryParam.newPrometheusQueryParam;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.StreamSupport.stream;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -61,27 +58,13 @@ public class AssetStateController {
     private AssetMgmt assetMgmt;
 
     @Inject
-    private AuthServer authServer;
-
-    @Inject
     private PrometheusQuery prometheusQuery;
 
     @Inject
     private AssetStateAspectProperties assetStateAspectProperties;
 
-    private static final String NO_PRINCIPAL = "noPrincipal";
-
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
-    public Map<String, AssetState> getAssetStatesWithToken(Principal principal) {
-        return getAssetsByPrincipal(principal.getName());
-
-    }
-
     public Map<String, AssetState> getAssetStates() {
-        return getAssetsByPrincipal(NO_PRINCIPAL);
-    }
-
-    private Map<String, AssetState> getAssetsByPrincipal(String principal) {
         List<Asset> assets = stream(assetMgmt.assets().spliterator(), false).collect(toList());
 
         return assetStateAspectProperties.getAspects().entrySet()
@@ -95,7 +78,7 @@ public class AssetStateController {
                                 ))
                                 .data.getResult().stream().map(result -> Pair.of(aspect.getKey(), result)))
                 .filter(aspectWithResult -> aspectWithResult.getRight().hasMetricProperty(assetStateAspectProperties.getMapping().getIdentifier()))
-                .filter(aspectWithResult -> existingAsset(assets, aspectWithResult.getRight(), principal))
+                .filter(aspectWithResult -> existingAsset(assets, aspectWithResult.getRight()))
                 .collect(groupingBy(aspectWithResult -> aspectWithResult.getRight().getMetricProperty(assetStateAspectProperties.getMapping().getIdentifier())))
                 .entrySet()
                 .stream()
@@ -103,16 +86,16 @@ public class AssetStateController {
                 .collect(
                         toMap(
                                 AssetState::getId,
-                                assetState -> postProcessEntries(assetState, assetStateAspectProperties.getAspects(), assets, principal)));
+                                assetState -> postProcessEntries(assetState, assetStateAspectProperties.getAspects(), assets)));
     }
 
-    private boolean existingAsset(List<Asset> assets, PrometheusRangeQueryResult.Data.RangeQueryMetric prometheusMetric, String principal) {
-        return findAsset(prometheusMetric.getMetricProperty(assetStateAspectProperties.getMapping().getIdentifier()), assets, principal).isPresent();
+    private boolean existingAsset(List<Asset> assets, PrometheusRangeQueryResult.Data.RangeQueryMetric prometheusMetric) {
+        return findAsset(prometheusMetric.getMetricProperty(assetStateAspectProperties.getMapping().getIdentifier()), assets).isPresent();
     }
 
-    private AssetState postProcessEntries(AssetState assetState, Map<String, AssetStateAspectProperties.Aspect> configuredAspects, List<Asset> assets, String principal) {
+    private AssetState postProcessEntries(AssetState assetState, Map<String, AssetStateAspectProperties.Aspect> configuredAspects, List<Asset> assets) {
         configuredAspects.keySet().stream()
-                .filter(configuredAspectKey -> findAsset(assetState.getId(), assets, principal).get().matchesLabels(configuredAspects.get(configuredAspectKey).getIncludeLabels()))
+                .filter(configuredAspectKey -> findAsset(assetState.getId(), assets).get().matchesLabels(configuredAspects.get(configuredAspectKey).getIncludeLabels()))
                 .filter(configuredAspectKey -> !assetState.getAspects().stream().anyMatch(aspect -> aspect.getName().equals(configuredAspectKey)))
                 .forEach(configuredAspectKey -> assetState.addAspect(newEmptyAspect(configuredAspectKey)));
         return assetState;
@@ -141,21 +124,10 @@ public class AssetStateController {
         return assetState;
     }
 
-    private Optional<Asset> findAsset(String assetId, List<Asset> assets, String principal) {
-        if (principal.equals(NO_PRINCIPAL))
-            return assets
+    private Optional<Asset> findAsset(String assetId, List<Asset> assets) {
+        return assets
                     .stream()
                     .filter(asset -> assetId.equals(asset.getAssetProperties().getProperties().get(assetStateAspectProperties.getMapping().getIdentifier())))
                     .findAny();
-        return assets
-                .stream()
-                .filter(asset -> asset.getRoles()
-                        .stream()
-                        .anyMatch(role ->
-                                ofNullable(authServer.getAuthServerUser(principal).getAuthorities())
-                                        .map(authorities -> authorities.contains(role))
-                                        .orElse(false)))
-                 .filter(asset -> assetId.equals(asset.getAssetProperties().getProperties().get(assetStateAspectProperties.getMapping().getIdentifier())))
-                .findAny();
     }
 }

@@ -28,11 +28,9 @@ import com.ixortalk.assetstate.AbstractSpringIntegrationTest;
 import com.ixortalk.assetstate.domain.aspect.Aspect;
 import com.ixortalk.assetstate.domain.aspect.AssetState;
 import com.ixortalk.assetstate.domain.asset.AspectBuilderforTest;
-import com.ixortalk.assetstate.domain.auth.AuthServerUser;
 import org.junit.Test;
 import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguration;
 import org.springframework.test.context.ActiveProfiles;
-import wiremock.com.google.common.collect.Sets;
 
 import javax.inject.Inject;
 import java.io.InputStream;
@@ -43,16 +41,13 @@ import java.util.Map;
 
 import static com.ixortalk.assetstate.ConfigurationTestConstants.ASPECT1;
 import static com.ixortalk.assetstate.ConfigurationTestConstants.ASPECT2;
-import static com.ixortalk.assetstate.config.OAuth2ExtendedConfiguration.CLIENT_IN_ORGANIZATION_X_ADMIN_ROLE_ID;
-import static com.ixortalk.assetstate.config.OAuth2ExtendedConfiguration.Role.ORGANIZATION_X_ADMIN;
-import static com.ixortalk.assetstate.config.OAuth2ExtendedConfiguration.clientInOrganizationXAdminRoleToken;
 import static com.ixortalk.assetstate.domain.aspect.Aspect.newEmptyAspect;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.*;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static java.time.Instant.ofEpochMilli;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ActiveProfiles({"test", "metric1And2"})
 @OAuth2ContextConfiguration(AbstractSpringIntegrationTest.AdminClientCredentialsResourceDetails.class)
@@ -132,13 +127,10 @@ public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrati
         setupPrometheusStubForMetric1(wireMockRule, METRIC1_PROMETHEUS_RESPONSE);
         setupPrometheusStubForMetric2(wireMockRule, METRIC2_PROMETHEUS_RESPONSE);
 
-        AuthServerUser authServerUser = new AuthServerUser();
-        setField(authServerUser, "authorities", Sets.newHashSet(ORGANIZATION_X_ADMIN.roleName()));
-        setupAuthServerStub(CLIENT_IN_ORGANIZATION_X_ADMIN_ROLE_ID, authServerUser);
         AssetState assetState = given()
                 .accept(JSON)
                 .contentType(JSON)
-                .auth().oauth2(clientInOrganizationXAdminRoleToken().getValue())
+                .auth().oauth2(adminToken().getValue())
                 .when()
                 .get("/states")
                 .then()
@@ -154,13 +146,10 @@ public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrati
         setupPrometheusStubForMetric1(wireMockRule, EXPECTED_PROMETHEUS_SINGLE_FRESH_METRICS_RESPONSE);
         setupPrometheusStubForMetric2(wireMockRule, NO_METRICS_PROMETHEUS_RESPONSE);
 
-        AuthServerUser authServerUser = new AuthServerUser();
-        setField(authServerUser, "authorities", Sets.newHashSet(ORGANIZATION_X_ADMIN.roleName()));
-        setupAuthServerStub(CLIENT_IN_ORGANIZATION_X_ADMIN_ROLE_ID, authServerUser);
         InputStream inputStream = given()
                 .accept(JSON)
                 .contentType(JSON)
-                .auth().oauth2(clientInOrganizationXAdminRoleToken().getValue())
+                .auth().oauth2(adminToken().getValue())
                 .when()
                 .get("/states")
                 .then()
