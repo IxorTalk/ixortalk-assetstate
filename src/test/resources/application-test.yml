@@ -40,6 +40,9 @@ ixortalk:
     time-range-in-seconds: 120                   # for use with range queries (time between start and end)
     range-vector-selector: 5m                    # for use with instant queries ([5m])
     staleness-threshold-in-seconds: 30           # used to check if metrics returning with a timestamp are stale
+  server:
+    authserver:
+      url: http://localhost:65301/authserver
 
 security:
     oauth2:

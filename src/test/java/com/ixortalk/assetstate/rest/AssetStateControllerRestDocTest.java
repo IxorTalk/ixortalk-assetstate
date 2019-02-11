@@ -23,23 +23,21 @@
  */
 package com.ixortalk.assetstate.rest;
 
-import java.io.UnsupportedEncodingException;
-
 import com.ixortalk.assetstate.AbstractSpringIntegrationTest;
+import com.ixortalk.assetstate.domain.auth.AuthServerUser;
 import com.ixortalk.test.util.FileUtil;
-import com.jayway.restassured.builder.RequestSpecBuilder;
-import com.jayway.restassured.specification.RequestSpecification;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguration;
+import wiremock.com.google.common.collect.Sets;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.ixortalk.assetstate.config.OAuth2ExtendedConfiguration.*;
+import static com.ixortalk.assetstate.config.OAuth2ExtendedConfiguration.Role.ORGANIZATION_X_ADMIN;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.FLATTENING_LABELS_PROMETHEUS_RESPONSE;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.METRIC1_PROMETHEUS_RESPONSE;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.METRIC2_PROMETHEUS_RESPONSE;
@@ -49,32 +47,16 @@ import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusS
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetric;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetricWithIncludeLabels;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetricWithRange;
-import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static org.apache.http.HttpStatus.SC_OK;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 
 @OAuth2ContextConfiguration(AbstractSpringIntegrationTest.AdminClientCredentialsResourceDetails.class)
 public class AssetStateControllerRestDocTest extends AbstractSpringIntegrationTest {
 
     private static final String ASSETS_WITH_METRICS = FileUtil.jsonFile("assetmgmt/assets.json");
-
-    @Rule
-    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("target/generated-snippets");
-
-    private RequestSpecification spec;
-
-    @Before
-    public void before () {
-        spec = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(this.restDocumentation))
-                .build();
-    }
 
     @Before
     public void additionalMetricsWithDifferentQueryStrings() throws Exception {
@@ -83,10 +65,15 @@ public class AssetStateControllerRestDocTest extends AbstractSpringIntegrationTe
         setupPrometheusStubForMetricWithIncludeLabels(wireMockRule, NO_METRICS_PROMETHEUS_RESPONSE);
         setupPrometheusStubForMetricWithRange(wireMockRule, NO_METRICS_PROMETHEUS_RESPONSE);
         setupPrometheusStubForMetric(wireMockRule, FLATTENING_LABELS_PROMETHEUS_RESPONSE);
+
+        setupAssetMgmtStubWithMetrics(ASSETS);
+        AuthServerUser authServerUser = new AuthServerUser();
+        setField(authServerUser, "authorities", Sets.newHashSet(ORGANIZATION_X_ADMIN.roleName()));
+        setupAuthServerStub(CLIENT_IN_ORGANIZATION_X_ADMIN_ROLE_ID, authServerUser);
     }
 
     @Test
-    public void getAssetStates () throws UnsupportedEncodingException {
+    public void getAssetStates () {
         stubFor(get(urlEqualTo("/assetmgmt/assets"))
                 .withHeader("Authorization", containing("Bearer"))
                 .willReturn(
@@ -95,14 +82,9 @@ public class AssetStateControllerRestDocTest extends AbstractSpringIntegrationTe
                                 .withStatus(SC_OK)
                 ));
 
-        given(this.spec)
+        given()
                 .accept(JSON)
-                .auth().preemptive().oauth2(adminToken().getValue())
-                .filter(
-                        document("assetstates/get/ok",
-                                preprocessResponse(prettyPrint())
-                        )
-                )
+                .auth().preemptive().oauth2(clientInOrganizationXAdminRoleToken().getValue())
                 .when()
                 .get("/states")
                 .then()

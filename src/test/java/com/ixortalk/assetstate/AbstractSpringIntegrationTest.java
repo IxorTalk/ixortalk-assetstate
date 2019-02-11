@@ -23,9 +23,12 @@
  */
 package com.ixortalk.assetstate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.ixortalk.assetstate.config.FixedClockConfiguration;
+import com.ixortalk.assetstate.config.feign.OAuth2FeignRequestInterceptor;
+import com.ixortalk.assetstate.domain.auth.AuthServerUser;
 import com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer;
 import com.jayway.restassured.RestAssured;
 import feign.RequestInterceptor;
@@ -70,6 +73,9 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 public abstract class AbstractSpringIntegrationTest implements RestTemplateHolder {
 
     @Rule
+    public WireMockRule authServerWireMockRule = new WireMockRule(65301);
+
+    @Rule
     public WireMockRule wireMockRule = new WireMockRule(65432);
 
     @Rule
@@ -112,17 +118,26 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
     }
 
     @Before
-    public void before() {
+    public void before() throws Exception {
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     protected void setupAssetMgmtStubWithMetrics(String assetResponse) {
         wireMockRule.stubFor(get(urlEqualTo("/assetmgmt/assets"))
-                .withHeader("Authorization", containing("Bearer"))
                 .willReturn(
                         aResponse()
                                 .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)
                                 .withBody(assetResponse)
+                                .withStatus(SC_OK)
+                ));
+    }
+
+    protected void setupAuthServerStub(String login, AuthServerUser authServerUser) throws JsonProcessingException {
+        authServerWireMockRule.stubFor(get(urlEqualTo("/authserver/api/users/" + login))
+                .willReturn(
+                        aResponse()
+                                .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)
+                                .withBody(objectMapper.writeValueAsString(authServerUser))
                                 .withStatus(SC_OK)
                 ));
     }

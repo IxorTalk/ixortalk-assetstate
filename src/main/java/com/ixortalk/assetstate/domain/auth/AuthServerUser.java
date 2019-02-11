@@ -21,38 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.assetstate.config.feign;
+package com.ixortalk.assetstate.domain.auth;
 
-import javax.inject.Inject;
+import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Logger;
-import feign.codec.Decoder;
-import feign.jackson.JacksonDecoder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
+public class AuthServerUser {
 
-public class FeignConfiguration {
+    private Set<String> authorities;
 
-    @Inject
-    private OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails;
-
-    @Inject
-    private ObjectMapper objectMapper;
-
-    @Bean
-    Logger.Level feignLoggerLevel() {
-        return Logger.Level.BASIC;
+    public AuthServerUser() {
     }
 
-    @Bean
-    public Decoder feignDecoder() {
-        return new JacksonDecoder(objectMapper);
-    }
-
-    @Bean
-    public OAuth2FeignRequestInterceptor requestInterceptor() {
-        return new OAuth2FeignRequestInterceptor(new OAuth2RestTemplate(oAuth2ProtectedResourceDetails));
+    public Set<String> getAuthorities() {
+        return authorities;
     }
 }

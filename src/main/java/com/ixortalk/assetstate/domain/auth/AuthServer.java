@@ -21,24 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.assetstate.domain.asset;
+package com.ixortalk.assetstate.domain.auth;
 
-import java.util.Map;
-import java.util.Set;
+import com.ixortalk.assetstate.config.feign.OAuth2ServiceFeignConfiguration;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-public class Asset {
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-    private AssetProperties assetProperties;
+@FeignClient(name = "authserver", url = "${ixortalk.server.authserver.url}", configuration = OAuth2ServiceFeignConfiguration.class, decode404 = true)
+public interface AuthServer {
 
-    private Set<String> roles;
+    @GetMapping(path = "/api/users/{login}", produces = APPLICATION_JSON_VALUE)
+    AuthServerUser getAuthServerUser(@PathVariable("login") String login);
 
-    public Set<String> getRoles() {
-        return roles;
-    }
-
-    public AssetProperties getAssetProperties() { return assetProperties; }
-
-    public boolean matchesLabels(Map<String, String> labels) {
-        return labels.entrySet().stream().allMatch(entry -> assetProperties.containsLabel(entry.getKey(), entry.getValue()));
-    }
 }

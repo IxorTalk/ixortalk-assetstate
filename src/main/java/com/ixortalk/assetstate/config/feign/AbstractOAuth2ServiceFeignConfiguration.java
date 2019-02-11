@@ -21,24 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.assetstate.domain.asset;
+package com.ixortalk.assetstate.config.feign;
 
-import java.util.Map;
-import java.util.Set;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Logger;
+import feign.codec.Decoder;
+import feign.jackson.JacksonDecoder;
+import org.springframework.context.annotation.Bean;
 
-public class Asset {
+import javax.inject.Inject;
 
-    private AssetProperties assetProperties;
+public abstract class AbstractOAuth2ServiceFeignConfiguration {
+    @Inject
+    private ObjectMapper objectMapper;
 
-    private Set<String> roles;
-
-    public Set<String> getRoles() {
-        return roles;
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.BASIC;
     }
 
-    public AssetProperties getAssetProperties() { return assetProperties; }
-
-    public boolean matchesLabels(Map<String, String> labels) {
-        return labels.entrySet().stream().allMatch(entry -> assetProperties.containsLabel(entry.getKey(), entry.getValue()));
+    @Bean
+    public Decoder feignDecoder() {
+        return new JacksonDecoder(objectMapper);
     }
 }

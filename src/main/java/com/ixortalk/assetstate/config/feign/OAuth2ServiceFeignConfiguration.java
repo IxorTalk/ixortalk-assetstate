@@ -21,24 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.assetstate.domain.asset;
+package com.ixortalk.assetstate.config.feign;
 
-import java.util.Map;
-import java.util.Set;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
-public class Asset {
+import javax.inject.Inject;
 
-    private AssetProperties assetProperties;
+public class OAuth2ServiceFeignConfiguration extends AbstractOAuth2ServiceFeignConfiguration {
 
-    private Set<String> roles;
+    @Inject
+    private OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails;
 
-    public Set<String> getRoles() {
-        return roles;
-    }
-
-    public AssetProperties getAssetProperties() { return assetProperties; }
-
-    public boolean matchesLabels(Map<String, String> labels) {
-        return labels.entrySet().stream().allMatch(entry -> assetProperties.containsLabel(entry.getKey(), entry.getValue()));
+    @Bean
+    public OAuth2FeignRequestInterceptor requestInterceptor() {
+        return new OAuth2FeignRequestInterceptor(new OAuth2RestTemplate(oAuth2ProtectedResourceDetails));
     }
 }
