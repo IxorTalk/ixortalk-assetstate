@@ -31,8 +31,6 @@ import com.ixortalk.assetstate.domain.asset.AspectBuilderforTest;
 import org.junit.Test;
 import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.inject.Inject;
 import java.io.InputStream;
@@ -50,8 +48,6 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
 import static java.time.Instant.ofEpochMilli;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles({"test", "metric1And2"})
 @OAuth2ContextConfiguration(AbstractSpringIntegrationTest.AdminClientCredentialsResourceDetails.class)
@@ -131,9 +127,17 @@ public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrati
         setupPrometheusStubForMetric1(wireMockRule, METRIC1_PROMETHEUS_RESPONSE);
         setupPrometheusStubForMetric2(wireMockRule, METRIC2_PROMETHEUS_RESPONSE);
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/states")).andExpect(status().isOk()).andReturn();;
+        AssetState assetState = given()
+                .accept(JSON)
+                .contentType(JSON)
+                .auth().oauth2(adminToken().getValue())
+                .when()
+                .get("/states")
+                .then()
+                .extract().response().as(AssetState.class);
 
-        assertEquals(EXPECTED_RESPONSE,  result.getResponse().getContentAsString(), false);
+        AssetState expectedAssetState = objectMapper.readValue(EXPECTED_RESPONSE, AssetState.class);
+        assertThat(assetState.getId()).isEqualTo(expectedAssetState.getId());
     }
 
     @Test

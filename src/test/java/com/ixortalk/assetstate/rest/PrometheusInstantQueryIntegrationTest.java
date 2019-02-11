@@ -35,7 +35,6 @@ import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguratio
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.ixortalk.assetstate.domain.prometheus.PrometheusQuery.PrometheusQueryParam.newPrometheusQueryParam;
@@ -53,7 +52,7 @@ public class PrometheusInstantQueryIntegrationTest extends AbstractSpringIntegra
 
     @Test
     public void whenRangeVectorIsRequestedFromInstantQueryThenCorrectPrometheusEndpointIsHit() throws Exception {
-        stubFor(get(urlEqualTo("/prometheus/api/v1/query?query=" + URLEncoder.encode("metric1[5m]","UTF-8")))
+        wireMockRule.stubFor(get(urlEqualTo("/prometheus/api/v1/query?query=" + URLEncoder.encode("metric1[5m]","UTF-8")))
                 .willReturn(
                         aResponse()
                                 .withBody(EXPECTED_PROMETHEUS_RANGE_RESPONSE)
