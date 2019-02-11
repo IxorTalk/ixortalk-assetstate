@@ -126,8 +126,8 @@ public class AssetStateController {
 
     private Optional<Asset> findAsset(String assetId, List<Asset> assets) {
         return assets
-                    .stream()
-                    .filter(asset -> assetId.equals(asset.getAssetProperties().getProperties().get(assetStateAspectProperties.getMapping().getIdentifier())))
-                    .findAny();
+                .stream()
+                .filter(asset -> assetId.equals(asset.getAssetProperties().getProperties().get(assetStateAspectProperties.getMapping().getIdentifier())))
+                .findAny();
     }
 }

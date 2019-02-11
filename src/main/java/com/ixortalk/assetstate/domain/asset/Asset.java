@@ -30,12 +30,6 @@ public class Asset {
 
     private AssetProperties assetProperties;
 
-    private Set<String> roles;
-
-    public Set<String> getRoles() {
-        return roles;
-    }
-
     public AssetProperties getAssetProperties() { return assetProperties; }
 
     public boolean matchesLabels(Map<String, String> labels) {
