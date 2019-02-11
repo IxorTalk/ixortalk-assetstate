@@ -10,7 +10,8 @@
             "labelKey2": "labelValue2",
             "someOtherLabel": "someOtherLabelValue"
           }
-        }
+        },
+        "roles": ["ROLE_ORGANIZATION_X_ADMIN", "ROLE_OTHER_ORG_ADMIN"]
       },
       {
         "assetId": "74721c8d-a491-4735-abdc-b109006fd002",
@@ -20,7 +21,8 @@
             "labelKey1": "labelValue1",
             "labelKey2": "notLabelValue2"
           }
-        }
+        },
+        "roles": ["ROLE_ORGANIZATION_X_ADMIN"]
       },
       {
         "assetId": "74721c8d-a491-4735-abdc-b109006fd003",
@@ -28,7 +30,8 @@
           "properties": {
             "controllerId": "asset3"
           }
-        }
+        },
+        "roles": ["ROLE_ORGANIZATION_X_ADMIN"]
       }
     ]
   }

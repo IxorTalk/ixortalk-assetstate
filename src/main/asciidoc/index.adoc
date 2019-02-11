@@ -19,7 +19,13 @@ include::{snippets}/assetstates/get/ok/curl-request.adoc[]
 HTTP request:
 include::{snippets}/assetstates/get/ok/http-request.adoc[]
 
-=== Response OK
+=== Response
+
+As admin (filtered on assets where the admin has access to):
 
 include::{snippets}/assetstates/get/ok/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/assetstates/get/as-user/http-response.adoc[]
 

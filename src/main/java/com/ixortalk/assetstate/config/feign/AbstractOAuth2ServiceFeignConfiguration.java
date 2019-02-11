@@ -21,19 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.assetstate.domain.asset;
+package com.ixortalk.assetstate.config.feign;
 
-import com.ixortalk.assetstate.config.feign.OAuth2ServicePropagatingFeignConfiguration;
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.hateoas.Resources;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Logger;
+import feign.codec.Decoder;
+import feign.jackson.JacksonDecoder;
+import org.springframework.context.annotation.Bean;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import javax.inject.Inject;
 
-@FeignClient(name = "assetmgmt",url = "${assetstate.assetmgmt.url}", configuration = OAuth2ServicePropagatingFeignConfiguration.class)
-public interface AssetMgmt {
+public abstract class AbstractOAuth2ServiceFeignConfiguration {
+    @Inject
+    private ObjectMapper objectMapper;
 
-    @RequestMapping(method = GET,path = "/assets")
-    Resources<Asset> assets();
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.BASIC;
+    }
 
+    @Bean
+    public Decoder feignDecoder() {
+        return new JacksonDecoder(objectMapper);
+    }
 }

@@ -23,33 +23,16 @@
  */
 package com.ixortalk.assetstate.config.feign;
 
-import javax.inject.Inject;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Logger;
-import feign.codec.Decoder;
-import feign.jackson.JacksonDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
-public class FeignConfiguration {
+import javax.inject.Inject;
+
+public class OAuth2ServiceFeignConfiguration extends AbstractOAuth2ServiceFeignConfiguration {
 
     @Inject
     private OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails;
-
-    @Inject
-    private ObjectMapper objectMapper;
-
-    @Bean
-    Logger.Level feignLoggerLevel() {
-        return Logger.Level.BASIC;
-    }
-
-    @Bean
-    public Decoder feignDecoder() {
-        return new JacksonDecoder(objectMapper);
-    }
 
     @Bean
     public OAuth2FeignRequestInterceptor requestInterceptor() {

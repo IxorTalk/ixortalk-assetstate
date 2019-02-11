@@ -26,6 +26,7 @@ package com.ixortalk.assetstate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.ixortalk.assetstate.config.FixedClockConfiguration;
+import com.ixortalk.assetstate.config.feign.OAuth2FeignRequestInterceptor;
 import com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer;
 import com.jayway.restassured.RestAssured;
 import feign.RequestInterceptor;
@@ -52,6 +53,9 @@ import javax.inject.Inject;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_ID_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_SECRET_ADMIN;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.authorizationHeader;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.userToken;
 import static com.ixortalk.test.util.FileUtil.jsonFile;
 import static com.jayway.restassured.config.ObjectMapperConfig.objectMapperConfig;
 import static com.jayway.restassured.config.RestAssuredConfig.config;
@@ -112,17 +116,35 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
     }
 
     @Before
-    public void before() {
+    public void before() throws Exception {
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     protected void setupAssetMgmtStubWithMetrics(String assetResponse) {
         wireMockRule.stubFor(get(urlEqualTo("/assetmgmt/assets"))
-                .withHeader("Authorization", containing("Bearer"))
                 .willReturn(
                         aResponse()
                                 .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)
                                 .withBody(assetResponse)
+                                .withStatus(SC_OK)
+                ));
+    }
+
+    protected void setupAssetMgmtStubWithMetricsAdminAndUser(String assetResponse) {
+        wireMockRule.stubFor(get(urlEqualTo("/assetmgmt/assets"))
+                .withHeader("Authorization", equalTo(authorizationHeader(adminToken())))
+                .willReturn(
+                        aResponse()
+                                .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)
+                                .withBody(assetResponse)
+                                .withStatus(SC_OK)
+                ));
+        wireMockRule.stubFor(get(urlEqualTo("/assetmgmt/assets"))
+                .withHeader("Authorization", equalTo(authorizationHeader(userToken())))
+                .willReturn(
+                        aResponse()
+                                .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)
+                                .withBody(jsonFile("assetmgmt/empty_assets.json"))
                                 .withStatus(SC_OK)
                 ));
     }
@@ -137,6 +159,7 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
             feignContext.getContextNames()
                     .stream()
                     .map(feignContextName -> feignContext.getInstance(feignContextName, RequestInterceptor.class))
+                    .filter(requestInterceptor -> requestInterceptor instanceof OAuth2FeignRequestInterceptor)
                     .forEach(requestInterceptor -> setField(requestInterceptor, "oAuth2RestTemplate", restTemplate, OAuth2RestTemplate.class));
         }
     }
