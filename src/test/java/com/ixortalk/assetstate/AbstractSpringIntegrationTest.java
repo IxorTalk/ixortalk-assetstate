@@ -51,10 +51,10 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.inject.Inject;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.ixortalk.assetstate.domain.AuthTokenHelper.authorizationHeader;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_ID_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_SECRET_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.authorizationHeader;
 import static com.ixortalk.test.oauth2.OAuth2TestTokens.userToken;
 import static com.ixortalk.test.util.FileUtil.jsonFile;
 import static com.jayway.restassured.config.ObjectMapperConfig.objectMapperConfig;
@@ -72,9 +72,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {AssetStateApplication.class, OAuth2EmbeddedTestServer.class, FixedClockConfiguration.class}, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
 public abstract class AbstractSpringIntegrationTest implements RestTemplateHolder {
-
-    @Rule
-    public WireMockRule authServerWireMockRule = new WireMockRule(65301);
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(65432);

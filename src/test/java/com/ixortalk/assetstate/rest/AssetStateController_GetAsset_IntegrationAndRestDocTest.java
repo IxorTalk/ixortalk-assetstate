@@ -41,7 +41,6 @@ import java.net.URLEncoder;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.ixortalk.assetstate.domain.AuthTokenHelper.authorizationHeader;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.*;
 import static com.ixortalk.test.oauth2.OAuth2TestTokens.*;
 import static com.ixortalk.test.util.FileUtil.jsonFile;

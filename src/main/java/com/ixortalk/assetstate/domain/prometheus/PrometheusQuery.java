@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import static java.util.stream.Collectors.joining;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-@FeignClient(name = "prometheust", url = "${assetstate.prometheus.url}", configuration = OAuth2ServiceFeignConfiguration.class)
+@FeignClient(name = "prometheus", url = "${assetstate.prometheus.url}", configuration = OAuth2ServiceFeignConfiguration.class)
 public interface PrometheusQuery {
 
     @RequestMapping(method = GET, value = "/api/v1/query")
