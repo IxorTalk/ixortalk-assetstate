@@ -26,9 +26,12 @@ package com.ixortalk.assetstate.domain.asset;
 import com.ixortalk.assetstate.config.feign.OAuth2ServicePropagatingFeignConfiguration;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.hateoas.Resources;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @FeignClient(name = "assetmgmt",url = "${assetstate.assetmgmt.url}", configuration = OAuth2ServicePropagatingFeignConfiguration.class)
 public interface AssetMgmt {
@@ -36,4 +39,6 @@ public interface AssetMgmt {
     @RequestMapping(method = GET,path = "/assets")
     Resources<Asset> assets();
 
+    @RequestMapping(method = POST,path = "/assets/search/property", consumes = APPLICATION_JSON_VALUE)
+    Asset[] getSingleAsset(@RequestBody AssetId assetId);
 }

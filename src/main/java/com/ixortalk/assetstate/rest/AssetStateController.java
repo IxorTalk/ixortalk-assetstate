@@ -23,21 +23,22 @@
  */
 package com.ixortalk.assetstate.rest;
 
+import com.google.common.collect.Lists;
 import com.ixortalk.assetstate.config.AssetStateAspectProperties;
 import com.ixortalk.assetstate.domain.aspect.AssetState;
 import com.ixortalk.assetstate.domain.asset.Asset;
+import com.ixortalk.assetstate.domain.asset.AssetId;
 import com.ixortalk.assetstate.domain.asset.AssetMgmt;
 import com.ixortalk.assetstate.domain.prometheus.PrometheusQuery;
 import com.ixortalk.assetstate.domain.prometheus.PrometheusRangeQueryResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.ixortalk.assetstate.domain.aspect.Aspect.newAspect;
 import static com.ixortalk.assetstate.domain.aspect.Aspect.newEmptyAspect;
@@ -63,11 +64,19 @@ public class AssetStateController {
     @Inject
     private AssetStateAspectProperties assetStateAspectProperties;
 
+    @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE, value = "/{assetId}")
+    public Map<String, AssetState> getAssetState(@PathVariable("assetId") AssetId assetId) {
+        if (assetMgmt.getSingleAsset(assetId).length>0)
+            return assetStateMao(Lists.newArrayList(assetMgmt.getSingleAsset(assetId)[0]));
+        return Collections.emptyMap();
+    }
+
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
     public Map<String, AssetState> getAssetStates() {
+        return assetStateMao(stream(assetMgmt.assets().spliterator(), false).collect(toList()));
+    }
 
-        List<Asset> assets = stream(assetMgmt.assets().spliterator(), false).collect(toList());
-
+    private Map<String, AssetState> assetStateMao(List<Asset> assets) {
         return assetStateAspectProperties.getAspects().entrySet()
                 .stream()
                 .flatMap(aspect ->
