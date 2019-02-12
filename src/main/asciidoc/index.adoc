@@ -29,3 +29,25 @@ As a user:
 
 include::{snippets}/assetstates/get/as-user/http-response.adoc[]
 
+== Retrieving a single asset state
+
+Via curl:
+include::{snippets}/assetstates/get-single/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/assetstates/get-single/ok/http-request.adoc[]
+
+Path Parameters:
+
+include::{snippets}/assetstates/get-single/ok/path-parameters.adoc[]
+
+=== Response
+
+As admin (filtered on assets where the admin has access to):
+
+include::{snippets}/assetstates/get-single/ok/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/assetstates/get-single/as-user/http-response.adoc[]
+

@@ -22,15 +22,21 @@
  * SOFTWARE.
  */
 package com.ixortalk.assetstate.domain.asset;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class AssetId {
 
-    private String value;
+    private String assetId;
 
-    protected AssetId(String id) {
-        this.value = id;
+    public AssetId() {}
+
+    public AssetId(String id) {
+        this.assetId = id;
     }
 
+    @JsonIgnore
     public String stringValue () {
-        return this.value;
+        return this.assetId;
     }
 }

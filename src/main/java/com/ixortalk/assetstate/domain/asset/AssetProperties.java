@@ -28,6 +28,8 @@ import java.util.Map;
 
 public class AssetProperties {
 
+    protected static final String ASSET_ID = "assetId";
+
     private Map<String, Object> properties = new HashMap<>();
 
     AssetProperties() {}
@@ -35,6 +37,8 @@ public class AssetProperties {
     public Map<String, Object> getProperties() {
         return properties;
     }
+
+    public Object getAssetId() { return this.properties.get(ASSET_ID);}
 
     public boolean containsLabel(String key, String value) {
         return properties.containsKey(key) && properties.get(key).equals(value);
