@@ -41,7 +41,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.*;
@@ -49,7 +48,7 @@ import static com.ixortalk.test.oauth2.OAuth2TestTokens.*;
 import static com.ixortalk.test.util.FileUtil.jsonFile;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
-import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.hateoas.MediaTypes.HAL_JSON_VALUE;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -78,12 +77,12 @@ public class AssetStateController_GetAsset_IntegrationAndRestDocTest extends Abs
                 .build();
 
         setupAssetMgmtStubWithMetricsAdminAndUser(SINGLE_ASSET);
-        asset = objectMapper.readValue(jsonFile("assetmgmt/single_asset_from_assetmgmt.json"), Asset[].class)[0];
+        asset = objectMapper.readValue(jsonFile("assetmgmt/single_asset_from_assetmgmt.json"), Asset.class);
 
         setupPrometheusStubForMetric1(wireMockRule, jsonFile("prometheus/metric1.json"));
         setupPrometheusStubForMetric2(wireMockRule, NO_METRICS_PROMETHEUS_RESPONSE);
 
-        wireMockRule.stubFor(post(urlEqualTo("/assetmgmt/assets/search/property"))
+        wireMockRule.stubFor(post(urlEqualTo("/assetmgmt/assets/find/property"))
                 .withHeader("Authorization", equalTo(authorizationHeader(adminToken())))
                 .withRequestBody(equalToJson(objectMapper.writeValueAsString(new AssetId(asset.getAssetProperties().getAssetId().toString()))))
                 .willReturn(
@@ -92,14 +91,13 @@ public class AssetStateController_GetAsset_IntegrationAndRestDocTest extends Abs
                                 .withBody(jsonFile("assetmgmt/single_asset_from_assetmgmt.json"))
                                 .withStatus(SC_OK)
                 ));
-        wireMockRule.stubFor(post(urlEqualTo("/assetmgmt/assets/search/property"))
+        wireMockRule.stubFor(post(urlEqualTo("/assetmgmt/assets/find/property"))
                 .withHeader("Authorization", equalTo(authorizationHeader(userToken())))
                 .withRequestBody(equalToJson(objectMapper.writeValueAsString(new AssetId(asset.getAssetProperties().getAssetId().toString()))))
                 .willReturn(
                         aResponse()
                                 .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)
-                                .withBody("[]")
-                                .withStatus(SC_OK)
+                                .withStatus(SC_NOT_FOUND)
                 ));
     }
 
@@ -121,14 +119,14 @@ public class AssetStateController_GetAsset_IntegrationAndRestDocTest extends Abs
                 .then()
                 .extract().asInputStream();
 
-        Map<String, AssetState> map = objectMapper.readValue(inputStream, new TypeReference<Map<String, AssetState>>() {
+        AssetState assetState = objectMapper.readValue(inputStream, new TypeReference<AssetState>() {
         });
 
-        assertThat(map).hasSize(1);
-        assertThat(map.get("asset1").getAspects()).hasSize(2);
+        assertThat(assetState).isNotNull();
+        assertThat(assetState.getAspects()).hasSize(2);
 
         wireMockRule.verify(
-                postRequestedFor(urlEqualTo("/assetmgmt/assets/search/property"))
+                postRequestedFor(urlEqualTo("/assetmgmt/assets/find/property"))
                 .withHeader("Authorization", equalTo(authorizationHeader(adminToken()))));
         wireMockRule.verify(
                 getRequestedFor(urlEqualTo("/prometheus/api/v1/query?query=" + URLEncoder.encode("metric1[5m]","UTF-8")))
@@ -153,13 +151,11 @@ public class AssetStateController_GetAsset_IntegrationAndRestDocTest extends Abs
                 .get("/states/{assetId}", asset.getAssetProperties().getAssetId().toString())
                 .then()
                 .extract().asInputStream();
-        Map<String, AssetState> map = objectMapper.readValue(inputStream, new TypeReference<Map<String, AssetState>>() {
-        });
 
-        assertThat(map).hasSize(0);
+        assertThat(inputStream.read()).isEqualTo(-1);
 
         wireMockRule.verify(
-                postRequestedFor(urlEqualTo("/assetmgmt/assets/search/property"))
+                postRequestedFor(urlEqualTo("/assetmgmt/assets/find/property"))
                         .withHeader("Authorization", equalTo(authorizationHeader(userToken()))));
     }
 }

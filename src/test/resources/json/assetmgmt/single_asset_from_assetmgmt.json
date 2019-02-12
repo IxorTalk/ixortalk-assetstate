@@ -1,28 +1,26 @@
-[
-  {
-    "assetId": "f2aa0731-a985-413f-a7e3-a8fd03cd5001",
-    "assetProperties": {
-      "properties": {
-        "controllerId": "asset1",
-        "hostname": "1.2.3.4",
-        "port": 82,
-        "actions": [
-          {
-            "securityLevel": "AUTOMATIC",
-            "name": "ActionName",
-            "payload": {}
-          }
-        ],
-        "company": {
-          "color": "#fff",
-          "logo": "",
-          "name": ""
-        },
-        "assetId": "myAssetId",
-        "limitedBandwidth": false
-      }
-    },
-    "children": [],
-    "roles": ["ROLE_ORGANIZATION_X_ADMIN"]
-  }
-]
+{
+  "assetId": "f2aa0731-a985-413f-a7e3-a8fd03cd5001",
+  "assetProperties": {
+    "properties": {
+      "controllerId": "asset1",
+      "hostname": "1.2.3.4",
+      "port": 82,
+      "actions": [
+        {
+          "securityLevel": "AUTOMATIC",
+          "name": "ActionName",
+          "payload": {}
+        }
+      ],
+      "company": {
+        "color": "#fff",
+        "logo": "",
+        "name": ""
+      },
+      "assetId": "myAssetId",
+      "limitedBandwidth": false
+    }
+  },
+  "children": [],
+  "roles": ["ROLE_ORGANIZATION_X_ADMIN"]
+}

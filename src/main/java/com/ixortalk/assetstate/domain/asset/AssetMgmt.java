@@ -33,12 +33,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-@FeignClient(name = "assetmgmt",url = "${assetstate.assetmgmt.url}", configuration = OAuth2ServicePropagatingFeignConfiguration.class)
+@FeignClient(name = "assetmgmt",url = "${assetstate.assetmgmt.url}", decode404 = true, configuration = OAuth2ServicePropagatingFeignConfiguration.class)
 public interface AssetMgmt {
 
     @RequestMapping(method = GET,path = "/assets")
     Resources<Asset> assets();
 
-    @RequestMapping(method = POST,path = "/assets/search/property", consumes = APPLICATION_JSON_VALUE)
-    Asset[] getSingleAsset(@RequestBody AssetId assetId);
+    @RequestMapping(method = POST,path = "/assets/find/property", consumes = APPLICATION_JSON_VALUE)
+    Asset getSingleAsset(@RequestBody AssetId assetId);
 }
