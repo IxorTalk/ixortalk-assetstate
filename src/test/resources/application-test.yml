@@ -41,8 +41,13 @@ ixortalk:
     range-vector-selector: 5m                    # for use with instant queries ([5m])
     staleness-threshold-in-seconds: 30           # used to check if metrics returning with a timestamp are stale
 
+  auth0:
+    domain: ixortalk-auth0-test-domain.com
+
 security:
     oauth2:
+        resource:
+          id: configured-resource-id
         client:
             grant-type: client_credentials
 

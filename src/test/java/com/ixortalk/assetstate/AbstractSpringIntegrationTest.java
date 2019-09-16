@@ -41,16 +41,18 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.test.OAuth2ContextSetup;
 import org.springframework.security.oauth2.client.test.RestTemplateHolder;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.WebApplicationContext;
 
 import javax.inject.Inject;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_ID_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_SECRET_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
@@ -66,7 +68,6 @@ import static org.springframework.hateoas.MediaTypes.HAL_JSON_VALUE;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.security.oauth2.client.test.OAuth2ContextSetup.standard;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {AssetStateApplication.class, OAuth2EmbeddedTestServer.class, FixedClockConfiguration.class}, webEnvironment = RANDOM_PORT)
@@ -82,17 +83,13 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
     @Inject
     protected ObjectMapper objectMapper;
 
-    protected MockMvc mockMvc;
+    protected OAuth2AccessToken adminToken, userToken;
 
     @LocalServerPort
     private int port;
 
     @Inject
     private ServerProperties serverProperties;
-
-    @Inject
-    private WebApplicationContext webApplicationContext;
-
 
     protected static final String ASSETS = jsonFile("assetmgmt/assets.json");
     protected static final String SINGLE_ASSET = jsonFile("assetmgmt/single_asset.json");
@@ -110,14 +107,12 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
     }
 
     @Before
-    public void restAssured() {
+    public void setup() {
         RestAssured.port = this.port;
         RestAssured.config = config().objectMapperConfig(objectMapperConfig().jackson2ObjectMapperFactory((cls, charset) -> objectMapper));
-    }
 
-    @Before
-    public void before() throws Exception {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
+        adminToken = adminToken();
+        userToken = userToken();
     }
 
     protected void setupAssetMgmtStubWithMetrics(String assetResponse) {
@@ -132,7 +127,7 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
 
     protected void setupAssetMgmtStubWithMetricsAdminAndUser(String assetResponse) {
         wireMockRule.stubFor(get(urlEqualTo("/assetmgmt/assets"))
-                .withHeader("Authorization", equalTo(authorizationHeader(adminToken())))
+                .withHeader("Authorization", equalTo(authorizationHeader(adminToken)))
                 .willReturn(
                         aResponse()
                                 .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)
@@ -140,7 +135,7 @@ public abstract class AbstractSpringIntegrationTest implements RestTemplateHolde
                                 .withStatus(SC_OK)
                 ));
         wireMockRule.stubFor(get(urlEqualTo("/assetmgmt/assets"))
-                .withHeader("Authorization", equalTo(authorizationHeader(userToken())))
+                .withHeader("Authorization", equalTo(authorizationHeader(userToken)))
                 .willReturn(
                         aResponse()
                                 .withHeader(CONTENT_TYPE, HAL_JSON_VALUE)

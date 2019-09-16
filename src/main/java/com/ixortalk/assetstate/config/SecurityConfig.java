@@ -21,27 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.assetstate.config.feign;
+package com.ixortalk.assetstate.config;
 
-import com.auth0.spring.security.api.authentication.JwtAuthentication;
-import feign.RequestInterceptor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.auth0.spring.security.api.JwtWebSecurityConfigurer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
-import static org.springframework.security.oauth2.common.OAuth2AccessToken.BEARER_TYPE;
+import static java.lang.String.format;
 
-public class OAuth2ServicePropagatingFeignConfiguration extends AbstractOAuth2ServiceFeignConfiguration {
+@EnableWebSecurity
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public RequestInterceptor requestInterceptor() {
-        return restTemplate -> {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication instanceof JwtAuthentication) {
-                JwtAuthentication jwtAuthentication = (JwtAuthentication) authentication;
-                restTemplate.header(AUTHORIZATION, String.format("%s %s", BEARER_TYPE, jwtAuthentication.getToken()));
-            }
-        };
+    @Value(value = "${security.oauth2.resource.id}")
+    private String audience;
+
+    @Value(value = "${ixortalk.auth0.domain}")
+    private String auth0Domain;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        JwtWebSecurityConfigurer
+                .forRS256(audience, format("https://%s/", auth0Domain))
+                .configure(http)
+                .authorizeRequests()
+                .anyRequest().authenticated();
     }
 }
