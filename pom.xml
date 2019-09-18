@@ -47,7 +47,7 @@
 		<snippetsDirectory>${project.build.directory}/generated-snippets</snippetsDirectory>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<ixortalk-test.version>1.0.5-SNAPSHOT</ixortalk-test.version>
+		<ixortalk-test.version>1.1.0</ixortalk-test.version>
 		<ixortalk-util.version>1.0.2</ixortalk-util.version>
 		<prometheus.simpleclient.version>0.0.22</prometheus.simpleclient.version>
 	</properties>
