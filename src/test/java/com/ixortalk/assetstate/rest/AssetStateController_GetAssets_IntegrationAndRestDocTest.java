@@ -40,12 +40,19 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.ixortalk.assetstate.rest.PrometheusStubHelper.*;
-import static com.ixortalk.test.oauth2.OAuth2TestTokens.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.NO_METRICS_PROMETHEUS_RESPONSE;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetric1;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetric2;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.authorizationHeader;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.userToken;
 import static com.ixortalk.test.util.FileUtil.jsonFile;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -87,6 +94,8 @@ public class AssetStateController_GetAssets_IntegrationAndRestDocTest extends Ab
                 )
                 .get("/states")
                 .then()
+                .log().all()
+                .statusCode(SC_OK)
                 .extract().asInputStream();
 
         Map<String, AssetState> map = objectMapper.readValue(inputStream, new TypeReference<Map<String, AssetState>>() {
@@ -119,7 +128,9 @@ public class AssetStateController_GetAssets_IntegrationAndRestDocTest extends Ab
                 )
                 .get("/states")
                 .then()
+                .statusCode(SC_OK)
                 .extract().asInputStream();
+
         Map<String, AssetState> map = objectMapper.readValue(inputStream, new TypeReference<Map<String, AssetState>>() {
         });
 
