@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.inject.Inject;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -42,7 +41,12 @@ import java.util.Map;
 import static com.ixortalk.assetstate.ConfigurationTestConstants.ASPECT1;
 import static com.ixortalk.assetstate.ConfigurationTestConstants.ASPECT2;
 import static com.ixortalk.assetstate.domain.aspect.Aspect.newEmptyAspect;
-import static com.ixortalk.assetstate.rest.PrometheusStubHelper.*;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.METRIC1_PROMETHEUS_RESPONSE;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.METRIC2_PROMETHEUS_RESPONSE;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.NO_METRICS_PROMETHEUS_RESPONSE;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.NO_PROMETHEUS_IDENTIFIER_RESPONSE;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetric1;
+import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetric2;
 import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.http.ContentType.JSON;
@@ -52,9 +56,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles({"test", "metric1And2"})
 @OAuth2ContextConfiguration(AbstractSpringIntegrationTest.AdminClientCredentialsResourceDetails.class)
 public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrationTest {
-
-    @Inject
-    private AssetStateController assetStateController;
 
     @Test
     public void assetStateReturnsCorrectAssetsFromAssetMgmt() throws Exception {
@@ -66,7 +67,16 @@ public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrati
 
         OffsetDateTime odt = OffsetDateTime.parse("2016-07-22T07:49:08.000Z");
 
-        Map<String, AssetState> assetStates = assetStateController.getAssetStates();
+        InputStream inputStream =
+                given()
+                        .accept(JSON)
+                        .auth().oauth2(adminToken().getValue())
+                        .when()
+                        .get("/states")
+                        .then()
+                        .extract().asInputStream();
+
+        Map<String,AssetState> assetStates = objectMapper.readValue(inputStream,new TypeReference<Map<String,AssetState>>() {});
 
         assertThat(assetStates).hasSize(3);
         assertThat(findAspect(assetStates, "asset1", ASPECT1).getValue()).isEqualTo("0");
@@ -106,7 +116,17 @@ public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrati
         setupPrometheusStubForMetric1(wireMockRule, METRIC1_PROMETHEUS_RESPONSE);
         setupPrometheusStubForMetric2(wireMockRule, METRIC2_PROMETHEUS_RESPONSE);
 
-        Map<String, AssetState> assetStates = assetStateController.getAssetStates();
+        InputStream inputStream =
+                given()
+                        .accept(JSON)
+                        .auth().oauth2(adminToken().getValue())
+                        .when()
+                        .get("/states")
+                        .then()
+                        .extract().asInputStream();
+
+        Map<String,AssetState> assetStates = objectMapper.readValue(inputStream,new TypeReference<Map<String,AssetState>>() {});
+
         assertThat(assetStates.get("asset_only_known_in_prometheus")).isNull();
     }
 
@@ -117,7 +137,17 @@ public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrati
         setupPrometheusStubForMetric1(wireMockRule, EXPECTED_PROMETHEUS_SINGLE_FRESH_METRICS_RESPONSE);
         setupPrometheusStubForMetric2(wireMockRule, NO_PROMETHEUS_IDENTIFIER_RESPONSE);
 
-        Map<String, AssetState> assetStates = assetStateController.getAssetStates();
+        InputStream inputStream =
+                given()
+                        .accept(JSON)
+                        .auth().oauth2(adminToken().getValue())
+                        .when()
+                        .get("/states")
+                        .then()
+                        .extract().asInputStream();
+
+        Map<String,AssetState> assetStates = objectMapper.readValue(inputStream,new TypeReference<Map<String,AssetState>>() {});
+
         assertThat(assetStates.get("asset1").getAspects()).extracting(Aspect::getName).containsOnly(ASPECT1, ASPECT2);
     }
 
@@ -127,14 +157,15 @@ public class AssetStateControllerIntegrationTest extends AbstractSpringIntegrati
         setupPrometheusStubForMetric1(wireMockRule, METRIC1_PROMETHEUS_RESPONSE);
         setupPrometheusStubForMetric2(wireMockRule, METRIC2_PROMETHEUS_RESPONSE);
 
-        AssetState assetState = given()
-                .accept(JSON)
-                .contentType(JSON)
-                .auth().oauth2(adminToken().getValue())
-                .when()
-                .get("/states")
-                .then()
-                .extract().response().as(AssetState.class);
+        AssetState assetState =
+                given()
+                        .accept(JSON)
+                        .contentType(JSON)
+                        .auth().oauth2(adminToken().getValue())
+                        .when()
+                        .get("/states")
+                        .then()
+                        .extract().response().as(AssetState.class);
 
         AssetState expectedAssetState = objectMapper.readValue(EXPECTED_RESPONSE, AssetState.class);
         assertThat(assetState.getId()).isEqualTo(expectedAssetState.getId());

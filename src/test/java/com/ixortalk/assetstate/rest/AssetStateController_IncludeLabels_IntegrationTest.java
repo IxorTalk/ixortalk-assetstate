@@ -23,24 +23,25 @@
  */
 package com.ixortalk.assetstate.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.ixortalk.assetstate.AbstractSpringIntegrationTest;
 import com.ixortalk.assetstate.domain.aspect.AssetState;
 import org.junit.Test;
 import org.springframework.security.oauth2.client.test.OAuth2ContextConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 
-import javax.inject.Inject;
+import java.io.InputStream;
 import java.util.Map;
 
 import static com.ixortalk.assetstate.rest.PrometheusStubHelper.setupPrometheusStubForMetricWithIncludeLabels;
+import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles({"test", "includeLabels"})
 @OAuth2ContextConfiguration(AbstractSpringIntegrationTest.AdminClientCredentialsResourceDetails.class)
 public class AssetStateController_IncludeLabels_IntegrationTest extends AbstractSpringIntegrationTest {
-
-    @Inject
-    private AssetStateController assetStateController;
 
     @Test
     public void specifiedIncludeLabelsUsedInPrometheusQueryAndFilterOnAssets() throws Exception {
@@ -48,7 +49,16 @@ public class AssetStateController_IncludeLabels_IntegrationTest extends Abstract
 
         setupPrometheusStubForMetricWithIncludeLabels(wireMockRule, EXPECTED_PROMETHEUS_SINGLE_METRIC_RESPONSE);
 
-        Map<String, AssetState> assetStates = assetStateController.getAssetStates();
+        InputStream inputStream =
+                given()
+                        .accept(JSON)
+                        .auth().oauth2(adminToken().getValue())
+                        .when()
+                        .get("/states")
+                        .then()
+                        .extract().asInputStream();
+
+        Map<String,AssetState> assetStates = objectMapper.readValue(inputStream,new TypeReference<Map<String,AssetState>>() {});
 
         assertThat(assetStates).hasSize(1).containsKeys("asset1");
     }

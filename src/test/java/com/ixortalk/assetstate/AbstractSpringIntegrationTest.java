@@ -26,7 +26,7 @@ package com.ixortalk.assetstate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.ixortalk.assetstate.config.FixedClockConfiguration;
-import com.ixortalk.assetstate.config.feign.OAuth2FeignRequestInterceptor;
+import com.ixortalk.autoconfigure.oauth2.feign.OAuth2FeignRequestInterceptor;
 import com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer;
 import com.jayway.restassured.RestAssured;
 import feign.RequestInterceptor;
@@ -50,7 +50,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.inject.Inject;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_ID_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2EmbeddedTestServer.CLIENT_SECRET_ADMIN;
 import static com.ixortalk.test.oauth2.OAuth2TestTokens.adminToken;
